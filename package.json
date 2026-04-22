@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node run.js",
     "start:ui": "node ui.js",
+    "install:browsers": "node node_modules/puppeteer/install.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",

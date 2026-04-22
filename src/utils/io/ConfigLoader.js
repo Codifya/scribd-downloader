@@ -1,8 +1,6 @@
 import fs from 'fs'
 import ini from 'ini'
-import path from 'path'
-
-const CONFIG_FILE = "config.ini"
+import { resolveRuntimePaths } from "../runtime/RuntimePaths.js"
 
 const DEFAULTS = {
     SCRIBD: {
@@ -14,20 +12,16 @@ const DEFAULTS = {
     }
 }
 
-class ConfigLoader {
-    constructor() {
-        if (!ConfigLoader.instance) {
-            this._config = this._loadFromFile()
-            ConfigLoader.instance = this
-        }
-        return ConfigLoader.instance
+export class ConfigLoader {
+    constructor({ configPath = resolveRuntimePaths().configPath } = {}) {
+        this.configPath = configPath
+        this._config = this._loadFromFile()
     }
 
     _loadFromFile() {
         try {
-            const configPath = path.resolve(process.cwd(), CONFIG_FILE)
-            if (fs.existsSync(configPath)) {
-                const content = fs.readFileSync(configPath, { encoding: "utf-8" })
+            if (fs.existsSync(this.configPath)) {
+                const content = fs.readFileSync(this.configPath, { encoding: "utf-8" })
                 return ini.parse(content)
             }
         } catch (err) {
@@ -82,4 +76,8 @@ class ConfigLoader {
     }
 }
 
-export const configLoader = new ConfigLoader()
+export function createConfigLoader(options = {}) {
+    return new ConfigLoader(options)
+}
+
+export const configLoader = createConfigLoader()

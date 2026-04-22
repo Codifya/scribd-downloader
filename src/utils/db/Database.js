@@ -1,40 +1,41 @@
 import sqlite3 from 'sqlite3'
 import path from 'path'
 import fs from 'fs'
+import { resolveRuntimePaths } from "../runtime/RuntimePaths.js"
 
-const DB_FILE = "history.db"
+const CREATE_HISTORY_TABLE_SQL = `
+    CREATE TABLE IF NOT EXISTS history (
+        url TEXT PRIMARY KEY,
+        file_path TEXT,
+        title TEXT,
+        created_at INTEGER
+    )
+`
 
-class Database {
-    constructor() {
-        if (!Database.instance) {
-            Database.instance = this
-            this.dbPath = path.resolve(process.cwd(), DB_FILE)
-            this._init()
-        }
-        return Database.instance
+export class Database {
+    constructor({ dbPath = resolveRuntimePaths().dbPath } = {}) {
+        this.dbPath = dbPath
+        fs.mkdirSync(path.dirname(this.dbPath), { recursive: true })
+        this.ready = this._init()
     }
 
     _init() {
-        this.db = new sqlite3.Database(this.dbPath, (err) => {
-            if (err) {
-                console.error("Failed to connect to database:", err.message)
-            } else {
-                this._createTables()
-            }
-        })
-    }
+        return new Promise((resolve, reject) => {
+            this.db = new sqlite3.Database(this.dbPath, (err) => {
+                if (err) {
+                    reject(err)
+                    return
+                }
 
-    _createTables() {
-        const sql = `
-            CREATE TABLE IF NOT EXISTS history (
-                url TEXT PRIMARY KEY,
-                file_path TEXT,
-                title TEXT,
-                created_at INTEGER
-            )
-        `
-        this.db.run(sql, (err) => {
-            if (err) console.error("Failed to create tables:", err.message)
+                this.db.run(CREATE_HISTORY_TABLE_SQL, (tableError) => {
+                    if (tableError) {
+                        reject(tableError)
+                        return
+                    }
+
+                    resolve()
+                })
+            })
         })
     }
 
@@ -44,10 +45,12 @@ class Database {
      * @returns {Promise<object|null>}
      */
     get(url) {
-        return new Promise((resolve, reject) => {
-            this.db.get("SELECT * FROM history WHERE url = ?", [url], (err, row) => {
-                if (err) reject(err)
-                else resolve(row)
+        return this.ready.then(() => {
+            return new Promise((resolve, reject) => {
+                this.db.get("SELECT * FROM history WHERE url = ?", [url], (err, row) => {
+                    if (err) reject(err)
+                    else resolve(row)
+                })
             })
         })
     }
@@ -59,19 +62,32 @@ class Database {
      * @param {string} title 
      */
     save(url, filePath, title = "") {
-        return new Promise((resolve, reject) => {
-            const sql = `INSERT OR REPLACE INTO history (url, file_path, title, created_at) VALUES (?, ?, ?, ?)`
-            const now = Date.now()
-            this.db.run(sql, [url, filePath, title, now], function(err) {
-                if (err) reject(err)
-                else resolve(this.lastID)
+        return this.ready.then(() => {
+            return new Promise((resolve, reject) => {
+                const sql = `INSERT OR REPLACE INTO history (url, file_path, title, created_at) VALUES (?, ?, ?, ?)`
+                const now = Date.now()
+                this.db.run(sql, [url, filePath, title, now], function(err) {
+                    if (err) reject(err)
+                    else resolve(this.lastID)
+                })
             })
         })
     }
 
     close() {
-        this.db.close()
+        return this.ready.then(() => {
+            return new Promise((resolve, reject) => {
+                this.db.close((err) => {
+                    if (err) reject(err)
+                    else resolve()
+                })
+            })
+        })
     }
 }
 
-export const database = new Database()
+export function createDatabase(options = {}) {
+    return new Database(options)
+}
+
+export const database = createDatabase()

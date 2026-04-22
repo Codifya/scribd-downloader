@@ -4,6 +4,7 @@ import { pdfGenerator } from "../utils/io/PdfGenerator.js"
 import { configLoader } from "../utils/io/ConfigLoader.js"
 import { directoryIo } from "../utils/io/DirectoryIo.js"
 import { cliReporter } from "../utils/Reporter.js"
+import { resolveOutputDirectory } from "../utils/runtime/RuntimePaths.js"
 import * as scribdRegex from "../const/ScribdRegex.js"
 import * as scribdFlag from '../const/ScribdFlag.js'
 import { Image } from "../object/Image.js"
@@ -16,7 +17,7 @@ class ScribdDownloader extends BaseDownloader {
         super()
         if (!ScribdDownloader.instance) {
             ScribdDownloader.instance = this
-            this.output = configLoader.load("DIRECTORY", "output", "output")
+            this.output = resolveOutputDirectory({ configLoader })
             this.filename = configLoader.load("DIRECTORY", "filename", "title")
             this.rendertime = configLoader.loadInt("SCRIBD", "rendertime", 100)
         }

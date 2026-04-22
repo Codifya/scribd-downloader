@@ -4,6 +4,7 @@ import { pdfGenerator } from "../utils/io/PdfGenerator.js"
 import { configLoader } from "../utils/io/ConfigLoader.js"
 import { directoryIo } from "../utils/io/DirectoryIo.js"
 import { cliReporter } from "../utils/Reporter.js"
+import { resolveOutputDirectory } from "../utils/runtime/RuntimePaths.js"
 import * as slideshareRegex from "../const/SlideshareRegex.js"
 import { Image } from "../object/Image.js"
 import sharp from "sharp"
@@ -17,7 +18,7 @@ class SlideshareDownloader extends BaseDownloader {
         super()
         if (!SlideshareDownloader.instance) {
             SlideshareDownloader.instance = this
-            this.output = configLoader.load("DIRECTORY", "output", "output")
+            this.output = resolveOutputDirectory({ configLoader })
             this.filename = configLoader.load("DIRECTORY", "filename", "title")
         }
         return SlideshareDownloader.instance

@@ -3,6 +3,7 @@ import { puppeteerSg } from "../utils/request/PuppeteerSg.js"
 import { configLoader } from "../utils/io/ConfigLoader.js"
 import { directoryIo } from "../utils/io/DirectoryIo.js"
 import { cliReporter } from "../utils/Reporter.js"
+import { resolveOutputDirectory } from "../utils/runtime/RuntimePaths.js"
 import * as everandRegex from "../const/EverandRegex.js"
 import axios from "axios"
 import fs from "fs"
@@ -14,7 +15,7 @@ class EverandDownloader extends BaseDownloader {
         super()
         if (!EverandDownloader.instance) {
             EverandDownloader.instance = this
-            this.output = configLoader.load("DIRECTORY", "output", "output")
+            this.output = resolveOutputDirectory({ configLoader })
         }
         return EverandDownloader.instance
     }

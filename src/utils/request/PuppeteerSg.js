@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer'
+import { buildMissingBrowserErrorMessage, resolveBrowserExecutable } from "./browserExecutable.js"
 
 class PuppeteerSg {
   constructor() {
@@ -35,11 +36,19 @@ class PuppeteerSg {
       '--disable-accelerated-2d-canvas',
       '--disable-gpu'
     ];
+    const { executablePath } = resolveBrowserExecutable({
+      defaultExecutablePath: () => puppeteer.executablePath()
+    });
+
+    if (!executablePath) {
+      throw new Error(buildMissingBrowserErrorMessage());
+    }
 
     try {
       this.browser = await puppeteer.launch({
         headless: "new",
         defaultViewport: null,
+        executablePath,
         args: isCI ? args : [],
         timeout: 30000, // 30s timeout for launch
       });
@@ -49,7 +58,6 @@ class PuppeteerSg {
       });
       
     } catch (error) {
-      console.error("Failed to launch Puppeteer:", error);
       throw error;
     }
   }

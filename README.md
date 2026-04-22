@@ -37,6 +37,14 @@ cd scribd-dl
 npm install
 ```
 
+If Puppeteer reports that Chromium is missing, run:
+
+```bash
+npm run install:browsers
+```
+
+The app will also fall back to an installed Chrome, Chromium, Brave, or Edge binary when available.
+
 ### Usage (Web UI)
 
 Launch the modern web interface:
@@ -73,6 +81,44 @@ rendertime=100  ; Time to wait for page rendering (ms)
 output=output   ; Download destination folder
 filename=title  ; Naming strategy: 'title' or 'id'
 ```
+
+## Dokploy Deployment
+
+This repo can be deployed on Dokploy with the committed [`Dockerfile`](Dockerfile).
+
+**Recommended Dokploy settings**
+
+- Build Type: `Dockerfile`
+- Dockerfile Path: `Dockerfile`
+- Docker Context Path: `.`
+- Internal Port: `3000`
+- Health Check: `curl -f http://localhost:3000/health`
+- Persistent Mount: `/app/data`
+
+**Container defaults**
+
+The image already sets these runtime defaults:
+
+```env
+NODE_ENV=production
+HOST=0.0.0.0
+PORT=3000
+CI=true
+DATA_DIR=/app/data
+OUTPUT_DIR=/app/data/output
+DB_PATH=/app/data/history.db
+CONFIG_PATH=/app/data/config.ini
+PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+```
+
+You usually do not need to redefine them in Dokploy unless you want different paths.
+
+**Notes**
+
+- `/health` returns HTTP `200` and is intended for Dokploy health checks.
+- Mount `/app/data` to persist downloads, SQLite history, and optional runtime config.
+- If `/app/data/config.ini` does not exist, the app starts with built-in defaults.
+- Chromium is installed in the image and Puppeteer is configured to use it.
 
 ## Development
 
