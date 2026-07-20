@@ -15,4 +15,14 @@ describe("AdSense markup", () => {
     test("includes the adsense verification meta tag", () => {
         expect(html).toContain('<meta name="google-adsense-account" content="ca-pub-5525349541277692">')
     })
+
+    test("includes the adblock banner and thanks toast containers", () => {
+        expect(html).toContain('id="adblock-banner"')
+        expect(html).toContain('id="adblock-banner-close"')
+        expect(html).toContain('id="adblock-thanks"')
+    })
+
+    test("loads the adblock module script", () => {
+        expect(html).toContain('<script type="module" src="/adblock.js"></script>')
+    })
 })

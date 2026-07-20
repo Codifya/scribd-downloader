@@ -15,6 +15,10 @@
   </head>
   <body>
     <main class="app">
+      <div id="adblock-banner" class="adblock-banner" hidden>
+        <span class="adblock-banner-text">Reklam engelleyici tespit edildi. Bu servisi ücretsiz tutabilmemiz reklam gelirine bağlı — devre dışı bırakmayı düşünür müsünüz?</span>
+        <button id="adblock-banner-close" class="adblock-banner-close" type="button" aria-label="Kapat">×</button>
+      </div>
       <header class="hero">
         <div class="hero-badges">
           <span class="badge" id="app-version">v1.0.0</span>
@@ -114,9 +118,14 @@
           </div>
         </div>
       </section>
+
+      <div id="adblock-thanks" class="adblock-thanks" hidden role="status">
+        Reklam engelleyiciyi kapattığınız için teşekkürler! 🙏
+      </div>
     </main>
 
     <script src="/app.js"></script>
+    <script type="module" src="/adblock.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
