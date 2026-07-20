@@ -523,3 +523,67 @@ input[type="url"]::placeholder {
 .adblock-thanks[hidden] {
   display: none;
 }
+
+/* Consent Banner */
+.consent-banner {
+  position: fixed;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+}
+
+.consent-banner[hidden] {
+  display: none;
+}
+
+.consent-banner-text {
+  margin: 0;
+  flex: 1 1 320px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.consent-banner-text a {
+  color: var(--accent);
+}
+
+.consent-banner-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Footer */
+.app-footer {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px 0 0;
+  font-size: 0.85rem;
+}
+
+.app-footer a,
+.app-footer-link {
+  color: var(--ink-muted);
+  text-decoration: underline;
+}
+
+.app-footer-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}

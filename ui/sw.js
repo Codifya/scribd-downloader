@@ -1,10 +1,12 @@
-const CACHE_NAME = 'lifinize-cache-v2'
+const CACHE_NAME = 'lifinize-cache-v3'
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
   '/adblock.js',
+  '/consent.js',
+  '/privacy.html',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
   '/assets/favicon.png',

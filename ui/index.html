@@ -9,6 +9,30 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
     <link rel="apple-touch-icon" href="/assets/icon-192.png" />
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() { dataLayer.push(arguments) }
+      (function () {
+        // Keep this TTL in sync with CONSENT_TTL_MS in ui/consent.js.
+        var TTL_MS = 365 * 24 * 60 * 60 * 1000
+        var granted = false
+        try {
+          var raw = localStorage.getItem('consent:adsense')
+          if (raw) {
+            var stored = JSON.parse(raw)
+            var isValid = stored && typeof stored.timestamp === 'number' && (Date.now() - stored.timestamp) <= TTL_MS
+            granted = isValid && stored.status === 'granted'
+          }
+        } catch (e) {
+          granted = false
+        }
+        gtag('consent', 'default', {
+          ad_storage: granted ? 'granted' : 'denied',
+          ad_user_data: granted ? 'granted' : 'denied',
+          ad_personalization: granted ? 'granted' : 'denied'
+        })
+      })()
+    </script>
     <meta name="google-adsense-account" content="ca-pub-5525349541277692">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5525349541277692"
       crossorigin="anonymous" id="adsbygoogle-script"></script>
@@ -122,10 +146,24 @@
       <div id="adblock-thanks" class="adblock-thanks" hidden role="status">
         Reklam engelleyiciyi kapattığınız için teşekkürler! 🙏
       </div>
+
+      <div id="consent-banner" class="consent-banner" hidden>
+        <p class="consent-banner-text">Bu site, reklam gösterimi için çerezler kullanır. "Kabul Et"e tıklayarak reklam çerezlerine izin vermiş olursunuz. Detaylar için <a href="/privacy.html">Gizlilik Politikamıza</a> bakabilirsiniz.</p>
+        <div class="consent-banner-actions">
+          <button id="consent-reject" class="neo-btn" type="button">Reddet</button>
+          <button id="consent-accept" class="neo-btn primary" type="button">Kabul Et</button>
+        </div>
+      </div>
+
+      <footer class="app-footer">
+        <a href="/privacy.html">Gizlilik Politikası</a>
+        <button id="consent-preferences" class="app-footer-link" type="button">Çerez Tercihleri</button>
+      </footer>
     </main>
 
     <script src="/app.js"></script>
     <script type="module" src="/adblock.js"></script>
+    <script type="module" src="/consent.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
